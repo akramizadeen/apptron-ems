@@ -4,7 +4,6 @@ const jwt = require('jsonwebtoken');
 
 const Employee = require('../models/Employee');
 
-
 // login
 const handleLogin = async (req, res) => {
     const { email, password } = req.body;
@@ -37,5 +36,8 @@ const handleLogin = async (req, res) => {
 }
 
 // logout
+const handleLogout = async (req, res) => {
+    const token = req.headers.authorization.split(' ')[1];
+}
 
 module.exports = { handleLogin }
