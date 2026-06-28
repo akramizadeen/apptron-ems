@@ -8,16 +8,13 @@ const Employee = require('../models/Employee');
 const handleLogin = async (req, res) => {
     const { email, password } = req.body;
 
-    const user = await Employee.find({ email: email });
+    const user = await Employee.findOne({ email: email });
 
     if (!user) {
-        res.status(404).json({ message: 'User not found' });
+        res.status(404).json({ message: 'User not found!' });
     }
 
-    const isPasswordMatch = await bcrypt.compare(
-        password,
-        user.password
-    );
+    const isPasswordMatch = await bcrypt.compare(password, user.password);
 
     if (email !== user.email || !isPasswordMatch) {
         res.status(400).json({ message: 'Invalid credentials!' });
@@ -29,15 +26,20 @@ const handleLogin = async (req, res) => {
             email: user.email,
         },
         process.env.JWT_SECRET,
-        { expresIn: '1h' }
+        { expiresIn: '1h' }
     );
 
-    res.json({ token });
+    res.json({ token, message: "User logged in successfully!" });
 }
 
 // logout
 const handleLogout = async (req, res) => {
-    const token = req.headers.authorization.split(' ')[1];
+    const authHeader = req.headers.authorization;
+    if (!authHeader) {
+        res.status(401).json({ message: "No access token!" });
+    }
+    res.removeHeader(authHeader);
+    res.status(200).json({ message: "Logged out successfully!" });
 }
 
-module.exports = { handleLogin }
+module.exports = { handleLogin, handleLogout }
